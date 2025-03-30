@@ -1,6 +1,7 @@
 {
   "name": "waldocoin-backend",
   "version": "1.0.0",
+  "description": "Backend for WALDOcoin using JSON Server",
   "scripts": {
     "start": "npx json-server --watch db.json --port $PORT"
   },
