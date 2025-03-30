@@ -1,0 +1,32 @@
+{
+  "wallets": [
+    {
+      "id": "b5b6",
+      "address": "rXYZ1234567890ABCDEF",
+      "twitterHandle": "@memechamp",
+      "followers": 1420,
+      "totalLikes": 6200,
+      "topMemeLikes": 2800,
+      "memes": [
+        {
+          "url": "https://twitter.com/user/status/123",
+          "views": 1340,
+          "likes": 280,
+          "xp": 75,
+          "level": 2,
+          "mintable": true
+        }
+      ],
+      "activity": [
+        "💰 Claimed 50 WALDOcoin",
+        "🔥 Meme #3 passed 1,000 likes!",
+        "📤 Submitted meme: 'Where's WALDO IRL'"
+      ],
+      "referrals": 3,
+      "totalEarned": 275.5
+    }
+  ]
+}
+
+
+  
