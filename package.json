@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Backend for WALDOcoin using JSON Server",
   "scripts": {
-    "start": "npx json-server --watch db.json --port $PORT"
+    "start": "npx json-server --watch db.json --port $PORT --host 0.0.0.0"
   },
   "dependencies": {
     "json-server": "^0.17.3"
