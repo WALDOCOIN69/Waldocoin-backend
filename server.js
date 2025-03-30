@@ -8,7 +8,7 @@ import fs from "fs";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5050;
+const port = process.env.PORT || 1000;
 app.use(cors());
 app.use(express.json());
 
