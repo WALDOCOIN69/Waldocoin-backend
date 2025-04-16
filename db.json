@@ -1,0 +1,25 @@
+{
+  "users": {
+    "rXYZ1234567890ABCDEF": {
+      "xp": 0,
+      "memes": [
+        {
+          "tweet_id": "111",
+          "likes": 120,
+          "retweets": 0,
+          "waldo_amount": 2.1,
+          "image_url": "https://via.placeholder.com/500"
+        },
+        {
+          "tweet_id": "222",
+          "likes": 300,
+          "retweets": 40,
+          "waldo_amount": 6.3,
+          "image_url": "https://via.placeholder.com/500"
+        }
+      ],
+      "referrals": [],
+      "twitter": "@yourhandle"
+    }
+  }
+}
