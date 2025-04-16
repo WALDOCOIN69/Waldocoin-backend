@@ -12,7 +12,8 @@ import { startAutoPayout } from "./autoPayoutJob.js";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5050;
+const port = process.env.PORT;
+
 
 // ✅ Middleware MUST come first
 app.use(cors());
@@ -23,6 +24,9 @@ app.use("/api/tweets", tweetsRoute);
 app.use("/api/claimStatus", claimStatusRoute);
 app.use("/api/battle", battleRoutes);
 app.use("/api/reset", resetBattleRoutes);
+app.get("/api/test", (req, res) => {
+  res.json({ success: true, message: "Server is alive and talking." });
+});
 
 app.use("/api/debug", debugRoutes);
 
