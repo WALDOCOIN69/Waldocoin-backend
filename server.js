@@ -9,20 +9,25 @@ import resetBattleRoutes from "./routes/resetBattles.js";
 
 dotenv.config();
 
-const app = express(); // ✅ move this BEFORE any app.use()
+const app = express();
 const port = process.env.PORT || 5050;
 
-app.use("/api/reset", resetBattleRoutes);
-
+// ✅ Middleware MUST come first
 app.use(cors());
 app.use(express.json());
 
-// Register routes AFTER initializing app
+// ✅ Routes
 app.use("/api/tweets", tweetsRoute);
 app.use("/api/claimStatus", claimStatusRoute);
-app.use('/api/battle', battleRoutes); // ✅ safe here now
+app.use("/api/battle", battleRoutes);
+app.use("/api/reset", resetBattleRoutes);
 
-// Load mock DB
+// ✅ Health check route for Render monitoring
+app.get('/api/health', (req, res) => {
+  res.status(200).send('WALDO backend is alive 😤');
+});
+
+// ✅ Optional local DB loader (if used elsewhere)
 const DB_PATH = "./db.json";
 function loadDB() {
   try {
@@ -31,9 +36,8 @@ function loadDB() {
     return { users: {} };
   }
 }
-app.get('/api/health', (req, res) => {
-  res.status(200).send('WALDO backend is alive 😤');
-});
 
-// Start server
-app.listen(port, () => console.log(`✅ WALDOcoin API running at http://localhost:${port}`));
+// ✅ Start server
+app.listen(port, () =>
+  console.log(`✅ WALDOcoin API running at http://localhost:${port}`)
+);
