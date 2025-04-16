@@ -6,7 +6,12 @@ import { updateXP } from '../utils/updateXP.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const router = express.Router();
+const router = express.Router(); // ✅ define this first
+
+router.get("/", (req, res) => {
+  res.send("⚔️ WALDO Battle API is online");
+});
+
 const xumm = new XummSdk(process.env.XUMM_API_KEY, process.env.XUMM_API_SECRET);
 const BATTLE_PATH = './battles.json';
 const WALDO_DESTINATION = process.env.WALDO_TREASURY_WALLET;
