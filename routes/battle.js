@@ -224,3 +224,9 @@ router.post('/payout', async (req, res) => {
     return res.status(500).json({ error: 'Payout failed' });
   }
 });
+
+// ✅ EXPORT ROUTER HERE (outside all routes)
+export default router;
+
+
+
