@@ -6,6 +6,7 @@ import tweetsRoute from "./routes/tweets.js";
 import claimStatusRoute from "./routes/claimStatus.js";
 import battleRoutes from './routes/battle.js';
 import resetBattleRoutes from "./routes/resetBattles.js";
+import debugRoutes from "./routes/debug.js";
 
 dotenv.config();
 
@@ -21,6 +22,8 @@ app.use("/api/tweets", tweetsRoute);
 app.use("/api/claimStatus", claimStatusRoute);
 app.use("/api/battle", battleRoutes);
 app.use("/api/reset", resetBattleRoutes);
+
+app.use("/api/debug", debugRoutes);
 
 // ✅ Health check route for Render monitoring
 app.get('/api/health', (req, res) => {
