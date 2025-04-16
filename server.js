@@ -7,6 +7,7 @@ import claimStatusRoute from "./routes/claimStatus.js";
 import battleRoutes from './routes/battle.js';
 import resetBattleRoutes from "./routes/resetBattles.js";
 import debugRoutes from "./routes/debug.js";
+import { startAutoPayout } from "./autoPayoutJob.js";
 
 dotenv.config();
 
@@ -41,6 +42,10 @@ function loadDB() {
 }
 
 // ✅ Start server
-app.listen(port, () =>
-  console.log(`✅ WALDOcoin API running at http://localhost:${port}`)
-);
+app.listen(port, () => {
+  console.log(`✅ WALDOcoin API running at http://localhost:${port}`);
+});
+
+// ✅ Start background job
+startAutoPayout(); // Runs every 5 minutes
+
