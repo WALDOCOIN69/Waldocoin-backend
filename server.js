@@ -5,11 +5,14 @@ import fs from "fs";
 import tweetsRoute from "./routes/tweets.js";
 import claimStatusRoute from "./routes/claimStatus.js";
 import battleRoutes from './routes/battle.js';
+import resetBattleRoutes from "./routes/resetBattles.js";
 
 dotenv.config();
 
 const app = express(); // ✅ move this BEFORE any app.use()
 const port = process.env.PORT || 5050;
+
+app.use("/api/reset", resetBattleRoutes);
 
 app.use(cors());
 app.use(express.json());
