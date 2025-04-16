@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Register routes AFTER initializing app
 app.use("/api/tweets", tweetsRoute);
-app.use("api/claimStatus", claimStatusRoute);
+app.use("/api/claimStatus", claimStatusRoute);
 app.use('/api/battle', battleRoutes); // ✅ safe here now
 
 // Load mock DB
