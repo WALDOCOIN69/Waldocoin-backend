@@ -6,17 +6,13 @@ import { updateXP } from '../utils/updateXP.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const router = express.Router(); // ✅ define this first
-
-router.get("/", (req, res) => {
-  res.send("⚔️ WALDO Battle API is online");
-});
+const router = express.Router();
 
 const xumm = new XummSdk(process.env.XUMM_API_KEY, process.env.XUMM_API_SECRET);
 const BATTLE_PATH = './battles.json';
 const WALDO_DESTINATION = process.env.WALDO_TREASURY_WALLET;
+const ADMIN_KEY = process.env.ADMIN_KEY || "waldogod2025";
 
-// Utility functions to load and save battles
 function loadBattle() {
   try {
     return JSON.parse(fs.readFileSync(BATTLE_PATH));
@@ -29,7 +25,10 @@ function saveBattle(battles) {
   fs.writeFileSync(BATTLE_PATH, JSON.stringify(battles, null, 2));
 }
 
-// GET /api/battle/active
+router.get("/", (req, res) => {
+  res.send("\u2694\ufe0f WALDO Battle API is online");
+});
+
 router.get('/active', (req, res) => {
   const battles = loadBattle();
   const activeBattle = battles.find((battle) => !battle.isComplete);
@@ -37,14 +36,9 @@ router.get('/active', (req, res) => {
   res.json(activeBattle);
 });
 
-// POST /api/battle/start
 router.post('/start', async (req, res) => {
   const { meme1, wallet } = req.body;
-
-  // Load existing battles
   const battles = loadBattle();
-
-  // Check if the user has already created 3 battles in the last 7 days
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const recentBattles = battles.filter(
     (battle) => battle.creator === wallet && battle.startTime >= sevenDaysAgo
@@ -54,27 +48,19 @@ router.post('/start', async (req, res) => {
     return res.status(400).json({ error: 'You can only start 3 battles in a 7-day period.' });
   }
 
-  // Check if there is an active battle
   const activeBattle = battles.find((battle) => !battle.isComplete);
   if (activeBattle) {
     return res.status(400).json({ error: 'A battle is already active.' });
   }
 
   try {
-    // Create a XUMM payload for the transaction
     const payload = await xumm.payload.create({
       txjson: {
         TransactionType: 'Payment',
         Destination: WALDO_DESTINATION,
-        Amount: '100000000', // 100 WALDO (in drops)
+        Amount: '100000000',
         DestinationTag: 4001,
-        Memos: [
-          {
-            Memo: {
-              MemoData: Buffer.from('WALDO_BATTLE_START').toString('hex'),
-            },
-          },
-        ],
+        Memos: [{ Memo: { MemoData: Buffer.from('WALDO_BATTLE_START').toString('hex') } }]
       },
       custom_meta: {
         identifier: 'waldo_battle_start',
@@ -82,7 +68,6 @@ router.post('/start', async (req, res) => {
       },
     });
 
-    // Create a new battle
     const newBattle = {
       battleId: Date.now().toString(),
       meme1,
@@ -97,10 +82,8 @@ router.post('/start', async (req, res) => {
       payloadUuid: payload.uuid,
     };
 
-    // Save the new battle
     battles.push(newBattle);
     saveBattle(battles);
-
     res.json({ success: true, launch: payload.next.always, qr: payload.refs.qr_png });
   } catch (err) {
     console.error('XUMM start error:', err);
@@ -108,7 +91,6 @@ router.post('/start', async (req, res) => {
   }
 });
 
-// POST /api/battle/accept
 router.post('/accept', async (req, res) => {
   const { meme2, wallet } = req.body;
   const battles = loadBattle();
@@ -121,15 +103,9 @@ router.post('/accept', async (req, res) => {
       txjson: {
         TransactionType: 'Payment',
         Destination: WALDO_DESTINATION,
-        Amount: '50000000', // 50 WALDO
+        Amount: '50000000',
         DestinationTag: 4002,
-        Memos: [
-          {
-            Memo: {
-              MemoData: Buffer.from('WALDO_BATTLE_ACCEPT').toString('hex'),
-            },
-          },
-        ],
+        Memos: [{ Memo: { MemoData: Buffer.from('WALDO_BATTLE_ACCEPT').toString('hex') } }]
       },
       custom_meta: {
         identifier: 'waldo_battle_accept',
@@ -158,8 +134,20 @@ router.post('/accept', async (req, res) => {
   }
 });
 
-// POST /api/battle/vote
-const ADMIN_KEY = process.env.ADMIN_KEY || "waldogodmode2025";
+router.post('/vote', (req, res) => {
+  const { wallet, choice } = req.body;
+  const battles = loadBattle();
+  const battle = battles.find((b) => !b.isComplete && b.accepted);
+
+  if (!battle) return res.status(400).json({ error: 'No active battle' });
+  const alreadyVoted = battle.votes.find((v) => v.wallet === wallet);
+  if (alreadyVoted) return res.status(400).json({ error: 'You already voted' });
+
+  battle.votes.push({ wallet, choice });
+  battle.pot += 5;
+  saveBattle(battles);
+  res.json({ success: true, message: 'Vote recorded.' });
+});
 
 router.post('/payout', async (req, res) => {
   if (req.headers["x-admin-key"] !== ADMIN_KEY) {
@@ -195,7 +183,6 @@ router.post('/payout', async (req, res) => {
   const voterWinners = voterMap[winnerKey];
   const toPoster = payout * 0.6;
   const toVoters = payout * 0.35;
-
   const perVoter = voterWinners.length > 0 ? toVoters / voterWinners.length : 0;
 
   try {
@@ -211,7 +198,7 @@ router.post('/payout', async (req, res) => {
     battle.isComplete = true;
     saveBattle(battles);
 
-    return res.json({
+    res.json({
       success: true,
       poster: toPoster,
       perVoter,
@@ -221,12 +208,9 @@ router.post('/payout', async (req, res) => {
     });
   } catch (err) {
     console.error('❌ WALDO payout failed:', err);
-    return res.status(500).json({ error: 'Payout failed' });
+    res.status(500).json({ error: 'Payout failed' });
   }
 });
 
-// ✅ EXPORT ROUTER HERE (outside all routes)
 export default router;
-
-
 
