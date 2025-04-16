@@ -4,6 +4,7 @@ import fs from "fs";
 const router = express.Router();
 const BATTLE_PATH = "./battles.json";
 
+// ✅ Create a fake battle
 router.post("/fake-battle", (req, res) => {
   try {
     const dummyBattle = {
@@ -35,4 +36,17 @@ router.post("/fake-battle", (req, res) => {
   }
 });
 
+// ✅ View current battles.json (LIVE)
+router.get("/battles", (req, res) => {
+  try {
+    const data = fs.readFileSync(BATTLE_PATH, "utf-8");
+    const battles = JSON.parse(data);
+    res.json(battles);
+  } catch (err) {
+    console.error("❌ Failed to read battles.json:", err);
+    res.status(500).json({ error: "Failed to load battles" });
+  }
+});
+
 export default router;
+
