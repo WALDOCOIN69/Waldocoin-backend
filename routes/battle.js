@@ -159,34 +159,22 @@ router.post('/accept', async (req, res) => {
 });
 
 // POST /api/battle/vote
-router.post('/vote', (req, res) => {
-  const { wallet, choice } = req.body;
-  const battles = loadBattle();
-  const battle = battles.find((b) => !b.isComplete && b.accepted);
+const ADMIN_KEY = process.env.ADMIN_KEY || "waldogodmode2025";
 
-  if (!battle) return res.status(400).json({ error: 'No active battle' });
-
-  const alreadyVoted = battle.votes.find((v) => v.wallet === wallet);
-  if (alreadyVoted) return res.status(400).json({ error: 'You already voted' });
-
-  battle.votes.push({ wallet, choice });
-  battle.pot += 5;
-  saveBattle(battles);
-
-  res.json({ success: true, message: 'Vote recorded.' });
-});
-
-// POST /api/battle/payout
 router.post('/payout', async (req, res) => {
+  if (req.headers["x-admin-key"] !== ADMIN_KEY) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
   const { battleId } = req.body;
   const battles = loadBattle();
   const battle = battles.find((b) => b.battleId === battleId);
 
-  if (!battle || battle.isComplete || battle.paidOut)
+  if (!battle || battle.isComplete || battle.paidOut) {
     return res.status(400).json({ error: 'Battle not found or already paid' });
+  }
 
   const { meme1, meme2, votes } = battle;
-
   const voteCount = { meme1: 0, meme2: 0 };
   const voterMap = { meme1: [], meme2: [] };
 
@@ -212,7 +200,6 @@ router.post('/payout', async (req, res) => {
 
   try {
     await sendWaldo(winnerPoster, toPoster);
-
     for (const voter of voterWinners) {
       await sendWaldo(voter, perVoter);
     }
@@ -221,6 +208,7 @@ router.post('/payout', async (req, res) => {
     await updateXP(battle[loserKey].tweet_id, 25);
 
     battle.paidOut = true;
+    battle.isComplete = true;
     saveBattle(battles);
 
     return res.json({
@@ -236,5 +224,3 @@ router.post('/payout', async (req, res) => {
     return res.status(500).json({ error: 'Payout failed' });
   }
 });
-
-export default router;

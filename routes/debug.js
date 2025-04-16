@@ -2,10 +2,15 @@ import express from "express";
 import fs from "fs";
 
 const router = express.Router();
+const ADMIN_KEY = process.env.ADMIN_KEY || "waldogodmode2025";
 const BATTLE_PATH = "./battles.json";
 
-// ✅ Create a fake battle
+// 🧪 Create a fake battle
 router.post("/fake-battle", (req, res) => {
+  if (req.headers["x-admin-key"] !== ADMIN_KEY) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
   try {
     const dummyBattle = {
       battleId: Date.now().toString(),
@@ -36,8 +41,12 @@ router.post("/fake-battle", (req, res) => {
   }
 });
 
-// ✅ View current battles.json (LIVE)
+// 👁️ View current battles
 router.get("/battles", (req, res) => {
+  if (req.headers["x-admin-key"] !== ADMIN_KEY) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
   try {
     const data = fs.readFileSync(BATTLE_PATH, "utf-8");
     const battles = JSON.parse(data);
@@ -49,4 +58,3 @@ router.get("/battles", (req, res) => {
 });
 
 export default router;
-
