@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Register routes AFTER initializing app
 app.use("/api/tweets", tweetsRoute);
-app.use("/claimStatus", claimStatusRoute);
+app.use("api/claimStatus", claimStatusRoute);
 app.use('/api/battle', battleRoutes); // ✅ safe here now
 
 // Load mock DB
@@ -28,6 +28,9 @@ function loadDB() {
     return { users: {} };
   }
 }
+app.get('/api/health', (req, res) => {
+  res.status(200).send('WALDO backend is alive 😤');
+});
 
 // Start server
 app.listen(port, () => console.log(`✅ WALDOcoin API running at http://localhost:${port}`));
