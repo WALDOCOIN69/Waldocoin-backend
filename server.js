@@ -8,12 +8,15 @@ import battleRoutes from './routes/battle.js';
 import resetBattleRoutes from "./routes/resetBattles.js";
 import debugRoutes from "./routes/debug.js";
 import { startAutoPayout } from "./autoPayoutJob.js";
+import mintedRoute from './routes/minted.js';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT;
 
+// Add this line to register the route
+app.use('/api/minted', mintedRoute);
 
 // ✅ Middleware MUST come first
 app.use(cors());
